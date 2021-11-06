@@ -6,12 +6,32 @@ public class GameOfLife
 {
     private bool edgeLooping;
     private bool[,] currentGrid, nextGrid;
-    private static readonly (int, int)[] positionsToCheck = new (int, int)[8]
+    private static readonly Coord[] positionsToCheck = new Coord[8]
     {
-            (-1, -1), (-1, 0), (-1, 1),
-            (0, -1),           (0, 1),
-            (1, -1),  (1, 0),  (1, 1)
+            new(-1, -1), new(-1, 0), new(-1, 1),
+            new(0, -1),              new(0, 1),
+            new(1, -1),  new(1, 0),  new(1, 1)
     };
+
+    public struct Coord
+    {
+        public Coord(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public static Coord operator +(Coord a) => a;
+        public static Coord operator -(Coord a) => new Coord(-a.X, -a.Y);
+
+        public static Coord operator +(Coord a, Coord b)
+            => new Coord(a.X + b.X, a.Y + b.Y);
+        public static Coord operator -(Coord a, Coord b)
+            => new Coord(a.X - b.X, a.Y - b.Y);
+    }
 
     public GameOfLife(int x, int y, bool edgeLooping = true)
     {
@@ -49,7 +69,7 @@ public class GameOfLife
         {
             for (int y = 0; y < currentGrid.GetLength(1); y++)
             {
-                nextGrid[x, y] = ApplySurvivalRules(currentGrid[x, y], GetLivingNeighbors(x, y));
+                nextGrid[x, y] = ApplySurvivalRules(currentGrid[x, y], GetLivingNeighbors(new Coord(x, y)));
             }
         }
 
@@ -62,30 +82,30 @@ public class GameOfLife
         {
             for (int y = 0; y < currentGrid.GetLength(1); y++)
             {
-                nextGrid[x, y] = ApplySurvivalRules(currentGrid[x, y], GetLivingNeighbors(x, y));
+                nextGrid[x, y] = ApplySurvivalRules(currentGrid[x, y], GetLivingNeighbors(new Coord(x, y)));
             }
         });
 
         currentGrid = nextGrid.Clone() as bool[,];
     }
 
-    private int GetLivingNeighbors(int x, int y)
+    private int GetLivingNeighbors(Coord coord)
     {
         int activeNeighbors = 0;
 
-        foreach ((int,int) position in positionsToCheck)
+        foreach (Coord adjPos in positionsToCheck)
         {
-            (int, int) activeCell = (x + position.Item1, y + position.Item2);
+            Coord activeCell = coord + adjPos;
 
-            if (IsPosInBounds(activeCell.Item1, activeCell.Item2))
+            if (IsPosInBounds(activeCell))
             {
-                if (currentGrid[activeCell.Item1, activeCell.Item2])
+                if (currentGrid[activeCell.X, activeCell.Y])
                     activeNeighbors++;
             }
             else if (edgeLooping)
             {
                 activeCell = ApplyEdgeLoopingToActiveCell(activeCell);
-                if (currentGrid[activeCell.Item1, activeCell.Item2])
+                if (currentGrid[activeCell.X, activeCell.Y])
                     activeNeighbors++;
             }
         }
@@ -94,23 +114,23 @@ public class GameOfLife
 
     }
 
-    private (int, int) ApplyEdgeLoopingToActiveCell((int,int) activeCell)
+    private Coord ApplyEdgeLoopingToActiveCell(Coord activeCell)
     {
-        if (activeCell.Item1 < 0)
+        if (activeCell.X < 0)
         {
-            activeCell.Item1 = currentGrid.GetLength(0) - 1;
+            activeCell.X = currentGrid.GetLength(0) - 1;
         }
-        else if (activeCell.Item1 >= currentGrid.GetLength(0))
+        else if (activeCell.X >= currentGrid.GetLength(0))
         {
-            activeCell.Item1 = 0;
+            activeCell.X = 0;
         }
-        if (activeCell.Item2 < 0)
+        if (activeCell.Y < 0)
         {
-            activeCell.Item2 = currentGrid.GetLength(1) - 1;
+            activeCell.Y = currentGrid.GetLength(1) - 1;
         }
-        else if (activeCell.Item2 >= currentGrid.GetLength(1))
+        else if (activeCell.Y >= currentGrid.GetLength(1))
         {
-            activeCell.Item2 = 0;
+            activeCell.Y = 0;
         }
         return activeCell;
     }
@@ -135,12 +155,12 @@ public class GameOfLife
         }
     }
 
-    private bool IsPosInBounds(int x, int y)
+    private bool IsPosInBounds(Coord coord)
     {
-        if (x < 0 || y < 0) 
+        if (coord.X < 0 || coord.Y < 0) 
             return false;
 
-        if (x >= currentGrid.GetLength(0) || y >= currentGrid.GetLength(1)) 
+        if (coord.X >= currentGrid.GetLength(0) || coord.Y >= currentGrid.GetLength(1)) 
             return false;
 
         return true;
@@ -149,5 +169,10 @@ public class GameOfLife
     public bool[,] GetGrid()
     {
         return currentGrid;
+    }
+
+    public void SetEdgeLooping(bool shouldEdgeLoop)
+    {
+        edgeLooping = shouldEdgeLoop;
     }
 }

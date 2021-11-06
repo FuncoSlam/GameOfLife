@@ -1,12 +1,12 @@
 ﻿
 using System.Diagnostics;
-using System.Linq;
 using GameOfLifeLibrary;
 
 public class Program
 {
     public static void Main()
     {
+        //SpaceProgressingConsoleOutputTest(); 
         ParallelizationPerformanceTest();
 
         static void OutputToConsole(GameOfLife gameOfLife, bool clearScreen = true)
@@ -36,11 +36,11 @@ public class Program
         static void ParallelizationPerformanceTest()
         {
             int cycle = 0;
-            int targetCycles = 1000;
+            int targetCycles = 10000;
 
             Stopwatch stopwatch = new();
 
-            GameOfLife gameOfLife = new(20, 20);
+            GameOfLife gameOfLife = new(100, 100);
 
             gameOfLife.PopulateCell(2, 2);
             gameOfLife.PopulateCell(3, 2);
@@ -88,6 +88,24 @@ public class Program
             OutputToConsole(gameOfLife, false);
 
             OutputToConsole(gameOfLifeParallel, false);
+        }
+
+        static void SpaceProgressingConsoleOutputTest()
+        {
+            GameOfLife gameOfLife = new(8, 8);
+
+            gameOfLife.PopulateCell(2, 2);
+            gameOfLife.PopulateCell(3, 2);
+            gameOfLife.PopulateCell(1, 2);
+            gameOfLife.PopulateCell(3, 1);
+            gameOfLife.PopulateCell(2, 0);
+
+            while (true)
+            {
+                OutputToConsole(gameOfLife, false);
+                Console.ReadKey();
+                gameOfLife.SimulateGameTick();
+            }
         }
     }
 
