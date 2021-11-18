@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace GameOfLifeLibrary;
+﻿namespace GameOfLifeLibrary;
 
 public class GameOfLife
 {
