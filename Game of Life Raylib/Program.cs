@@ -6,7 +6,7 @@ using GameOfLifeLibrary;
 
 static class Program
 {
-    static int windowHeight = 800, windowWidth = 400;
+    static int windowHeight = 1200, windowWidth = 800;
     static GameOfLife gameOfLife = new(100, 100);
 
     static Color backgroundColor = Color.RAYWHITE;
@@ -16,7 +16,7 @@ static class Program
 
     static Camera2D camera = new(new Vector2(windowHeight / 2, windowWidth / 2), Vector2.Zero, 0f, 1f);
     static float camSpeed = 200f;
-    static float zoomSpeed = 0.3f;
+    static float zoomSpeed = 0.8f;
 
     static int cellWidth = 20;
     static int cellBorderWidth = 1;
@@ -51,17 +51,17 @@ static class Program
                 camera.target.X += camSpeed * GetFrameTime() / camera.zoom;
 
             if (IsKeyDown(KeyboardKey.KEY_Z))
-                camera.zoom *= zoomSpeed * GetFrameTime();
+                camera.zoom *= MathF.Pow(zoomSpeed, GetFrameTime());
 
             if (IsKeyDown(KeyboardKey.KEY_X))
-                camera.zoom /= zoomSpeed * GetFrameTime();
+                camera.zoom /= MathF.Pow(zoomSpeed, GetFrameTime());
 
 
             // DRAWING 2D
 
             BeginMode2D(camera);
             {
-                DrawCircle(0, 0, 15f, Color.RED);
+                DrawCircle(0, 0, 6f, Color.RED);
                 RenderGame();
             }
             EndMode2D();
@@ -69,9 +69,12 @@ static class Program
 
             // DRAWING UI
 
-            DrawText($"Camera Target: ({camera.target.X}, {camera.target.Y})\n" +
+            DrawText(
+                $"Camera Target: ({camera.target.X}, {camera.target.Y})\n" +
                 $"Mouse Position: ({GetMousePosition().X}, {GetMousePosition().Y})\n" +
-                $"", 12, 12, 20, Color.BLACK);
+                $"Zoom Level: {camera.zoom}\n" +
+                $"FPS: {1/GetFrameTime()}", 
+                    12, 12, 20, Color.BLACK);
 
             EndDrawing();
         }
