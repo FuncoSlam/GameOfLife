@@ -48,12 +48,14 @@ public class GameOfLife
 
     public void PopulateCell(int x, int y)
     {
-        currentGrid[x, y] = true;
+        if (IsPosInBounds(new Coord(x, y)))
+            currentGrid[x, y] = true;
     }
 
     public void DepopulateCell(int x, int y)
     {
-        currentGrid[x, y] = false;
+        if (IsPosInBounds(new Coord(x, y)))
+            currentGrid[x, y] = false;
     }
 
     public void ToggleCell(int x, int y)
@@ -153,7 +155,7 @@ public class GameOfLife
         }
     }
 
-    private bool IsPosInBounds(Coord coord)
+    public bool IsPosInBounds(Coord coord)
     {
         if (coord.X < 0 || coord.Y < 0) 
             return false;
