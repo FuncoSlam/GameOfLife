@@ -12,6 +12,7 @@ static class Program
 	static GameOfLife gameOfLife = new(40, 34);
 	static int targetTPS = 8;
 	static Stopwatch tickTimer = new();
+	static Int64 msBetweenTicks = 1000;
 	static bool isPaused = false;
 
 	static Color backgroundColor = Color.RAYWHITE;
@@ -28,12 +29,12 @@ static class Program
 	static int cellWidth = 20;
 	static int cellBorderWidth = 1;
 
-	public static void Main()
+	public static void Main(string[] args)
 	{
 
 		InitWindow(windowWidth, windowHeight, "Conway's Game of Life");
 		// Image myImage = Resources.Conway_Toy;
-		SetTargetFPS(60);
+		SetTargetFPS(120);
 		tickTimer.Start();
 
 		// INITIALIZE GAME STATE
@@ -80,6 +81,7 @@ static class Program
 
 			if (tickTimer.ElapsedMilliseconds > (1000 / targetTPS) & !isPaused)
 			{
+				msBetweenTicks = tickTimer.ElapsedMilliseconds;
 				tickTimer.Restart();
 				gameOfLife.SimulateGameTick();
 			}
@@ -116,13 +118,15 @@ static class Program
 			// DRAWING UI
 
 			DrawText(
-				$"Camera Target: ({camera.target.X}, {camera.target.Y})\n" +
-				$"Camera Offset: ({camera.offset.X}, {camera.offset.Y})\n" +
+#if DEBUG
+				$"Camera Target: ({camera.target.X.ToString("n2")}, {camera.target.Y.ToString("n2")})\n" +
+				$"Camera Offset: ({camera.offset.X.ToString("n2")}, {camera.offset.Y.ToString("n2")})\n" +
 				$"Mouse Position: ({GetMousePosition().X}, {GetMousePosition().Y})\n" +
-				$"Zoom Level: {camera.zoom}\n" +
-				$"FPS: {1/GetFrameTime()}\n" +
-				$"TPS: {(isPaused ? "PAUSED" : targetTPS)}", 
-					12, 12, 20, Color.BLACK);
+				$"Zoom Level: {camera.zoom.ToString("n2")}\n" +
+#endif
+				$"FPS: {(1f/GetFrameTime()).ToString("n2")}\n" +
+				$"TPS: {(isPaused ? "PAUSED" : ((1f/msBetweenTicks)*1000).ToString("n2"))}",
+					14, 14, 20, Color.BLACK);
 
 			EndDrawing();
 

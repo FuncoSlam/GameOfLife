@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Game_of_Life_Raylib</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
