@@ -9,7 +9,7 @@ static class Program
 {
 	static int windowWidth = 1200, windowHeight = 800;
 
-	static GameOfLife gameOfLife = new(40, 34);
+	static GameOfLife gameOfLife = new(1000, 400);
 	static int targetTPS = 8;
 	static Stopwatch tickTimer = new();
 	static Int64 msBetweenTicks = 1000;
@@ -83,7 +83,7 @@ static class Program
 			{
 				msBetweenTicks = tickTimer.ElapsedMilliseconds;
 				tickTimer.Restart();
-				gameOfLife.SimulateGameTick();
+				gameOfLife.SimulateGameTickParallel();
 			}
 
 			if (IsKeyPressed(KeyboardKey.KEY_A))
@@ -141,6 +141,9 @@ static class Program
 					DrawRectangle(highlightStartX, highlightStartY, totalCellWidth, totalCellWidth, cellBorderHighlight);
 				}
 
+				Vector2 screenTopLeftWorldPoint = GetScreenToWorld2D(new(), camera);
+				Vector2 screenBotRightWorldPoint = GetScreenToWorld2D(new(GetScreenWidth(), GetScreenHeight()), camera);
+
 				for (int x = 0; x < gridToRender.GetLength(0); x++)
 				{
 					for (int y = 0; y < gridToRender.GetLength(1); y++)
@@ -148,13 +151,23 @@ static class Program
 						int cellStartX = startX + (totalCellWidth * x) + cellBorderWidth;
 						int cellStartY = startY + (totalCellWidth * y) + cellBorderWidth;
 
-						Color cellColor;
-						if (gridToRender[x, y])
-							cellColor = activeCellColor;
-						else
-							cellColor = inactiveCellColor;
 
-						DrawRectangle(cellStartX, cellStartY, cellWidth, cellWidth, cellColor);
+						bool isCellOnScreen =
+							cellStartX < screenBotRightWorldPoint.X && 
+							cellStartY < screenBotRightWorldPoint.Y &&
+							cellStartX + totalCellWidth > screenTopLeftWorldPoint.X &&
+							cellStartY + totalCellWidth > screenTopLeftWorldPoint.Y;
+
+						if (isCellOnScreen)
+                        {
+							Color cellColor;
+							if (gridToRender[x, y])
+								cellColor = activeCellColor;
+							else
+								cellColor = inactiveCellColor;
+
+							DrawRectangle(cellStartX, cellStartY, cellWidth, cellWidth, cellColor);
+						}
 					}
 				}
 			}
